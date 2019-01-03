@@ -26,6 +26,11 @@ export function setupButtonChild(ButtonComponent : Buttons) : void {
 
         const xprops = ButtonComponent.xprops;
 
+        let layout = BUTTON_LAYOUT.HORIZONTAL;
+        if (xprops && xprops.style && xprops.style.layout) {
+            layout = xprops.style.layout;
+        }
+
         logger.track({
             [FPTI_KEY.STATE]:          FPTI_STATE.BUTTON,
             [FPTI_KEY.TRANSITION]:     FPTI_TRANSITION.BUTTON_LOAD,
@@ -33,7 +38,7 @@ export function setupButtonChild(ButtonComponent : Buttons) : void {
             [FPTI_KEY.FUNDING_LIST]:   fundingSources.join(':'),
             [FPTI_KEY.FUNDING_COUNT]:  fundingSources.length.toString(),
             [FPTI_KEY.PAGE_LOAD_TIME]: pageRenderTime ? pageRenderTime.toString() : '',
-            [FPTI_KEY.BUTTON_LAYOUT]:  (xprops && xprops.style && xprops.style.layout) || BUTTON_LAYOUT.HORIZONTAL
+            [FPTI_KEY.BUTTON_LAYOUT]:  layout
         });
 
         logger.flush();

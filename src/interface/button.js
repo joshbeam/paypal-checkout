@@ -1,6 +1,5 @@
 /* @flow */
 
-import { noop } from 'belter/src';
 import type { ZalgoPromise } from 'zalgo-promise/src';
 import { isPayPalDomain } from '@paypal/sdk-client/src';
 import { PopupOpenError as _PopupOpenError } from 'zoid/src';
@@ -23,7 +22,7 @@ export function Buttons(props : ButtonProps = {}) : { render : (string | HTMLEle
     return {
         render: (container) => {
             // $FlowFixMe
-            return ButtonsComponent.render(props, container).then(noop);
+            return ButtonsComponent.render(props, container);
         }
     };
 }
