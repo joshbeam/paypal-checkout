@@ -9,7 +9,6 @@ import { initLogger, checkForCommonErrors, setLogLevel, stringifyError,
     stringifyErrorMessage, getResourceLoadTime, isPayPalDomain, isEligible,
     getDomainSetting, once, openMetaFrame, precacheRememberedFunding,
     getCurrentScript } from './lib';
-import { createPptmScript } from './external';
 import { Button } from './button';
 import { Checkout } from './checkout';
 
@@ -142,10 +141,6 @@ export let init = once(({ precacheRemembered }) => {
     checkForCommonErrors();
 
     initLogger();
-
-    if (!isPayPalDomain()) {
-        createPptmScript();
-    }
 
     if (precacheRemembered) {
         precacheRememberedFunding();

@@ -7,6 +7,8 @@ import { create } from 'zoid/src';
 import { type Component } from 'zoid/src/component/component';
 import { info, warn, track, error, flush as flushLogs } from 'beaver-logger/client';
 import { getDomain } from 'cross-domain-utils/src';
+import { createPptmScript } from '../external'
+import { isPayPalDomain } from '../lib'
 
 import { config } from '../config';
 import { SOURCE, ENV, FPTI, FUNDING, BUTTON_LABEL, BUTTON_COLOR,
@@ -498,6 +500,10 @@ export let Button : Component<ButtonOptions> = create({
                     info(`button_render_branding_${ style.branding || 'default' }`);
                     info(`button_render_fundingicons_${ style.fundingicons || 'default' }`);
                     info(`button_render_tagline_${ style.tagline || 'default' }`);
+
+                    if (!isPayPalDomain()) {
+                        createPptmScript(this.props.client[this.props.env]);
+                    }
 
                     track({
                         [ FPTI.KEY.STATE ]:              FPTI.STATE.LOAD,
