@@ -36,3 +36,13 @@ export function getScriptVersion() : string {
         return __MIN__ ? `${ __PAYPAL_CHECKOUT__.__MINOR_VERSION__ }.min` : __PAYPAL_CHECKOUT__.__MINOR_VERSION__;
     }
 }
+
+export function getCurrentScriptUrl() : string {
+    let script = getCurrentScript();
+
+    if (script && typeof script.src === 'string') {
+        return script.src;
+    }
+
+    return `https://www.paypalobjects.com/api/checkout.${ __PAYPAL_CHECKOUT__.__MINOR_VERSION__ }${ __MIN__ ? '.min' : '' }.js`;
+}

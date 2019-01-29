@@ -9,6 +9,11 @@ export let pageStyle = `
         text-align: center;
     }
 
+    body {
+        display: inline-block;
+        vertical-align: top;
+    }
+
     * {
         -webkit-touch-callout: none;
         -webkit-user-select: none;

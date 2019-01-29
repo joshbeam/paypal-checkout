@@ -14,7 +14,7 @@ import { SOURCE, ENV, FPTI, FUNDING, BUTTON_LABEL, BUTTON_COLOR,
     BUTTON_SIZE, BUTTON_SHAPE, BUTTON_LAYOUT, COUNTRY } from '../constants';
 import { redirect as redir, checkRecognizedBrowser,
     getBrowserLocale, getSessionID, request, getScriptVersion,
-    isIEIntranet, isEligible, getCurrentScript,
+    isIEIntranet, isEligible, getCurrentScriptUrl,
     getDomainSetting, extendUrl, isDevice, rememberFunding,
     getRememberedFunding, memoize, uniqueID, getThrottle, getBrowser, isPayPalDomain } from '../lib';
 import { rest, getPaymentOptions, addPaymentDetails, getPaymentDetails } from '../api';
@@ -123,6 +123,11 @@ export let Button : Component<ButtonOptions> = create({
     listenForResize: true,
 
     containerTemplate,
+
+    autoResize: {
+        height: true,
+        width:  false
+    },
 
     // eslint-disable-next-line no-unused-vars
     prerenderTemplate({ props, jsxDom } : { props : Object, jsxDom : Function }) : HTMLElement {
@@ -475,7 +480,10 @@ export let Button : Component<ButtonOptions> = create({
         commit: {
             type:       'boolean',
             required:   false,
-            queryParam: true
+            queryParam: true,
+            queryValue: (val) => {
+                return val ? 'true' : 'false';
+            }
         },
 
         onRender: {
@@ -855,7 +863,16 @@ export let Button : Component<ButtonOptions> = create({
 
         validate: {
             type:     'function',
-            required: false
+            required: false,
+            decorate(validate) : Function {
+                // $FlowFixMe
+                return function decorateValidate(actions) : mixed {
+                    if (!this.validateCalled) {
+                        this.validateCalled = true;
+                        return validate(actions);
+                    }
+                };
+            }
         },
 
         logLevel: {
@@ -872,7 +889,7 @@ export let Button : Component<ButtonOptions> = create({
             sendToChild: false,
             def:         () => {
                 return btoa(JSON.stringify({
-                    url: getCurrentScript()
+                    url: getCurrentScriptUrl()
                 }));
             }
         },
