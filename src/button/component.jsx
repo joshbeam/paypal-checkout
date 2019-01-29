@@ -8,6 +8,7 @@ import { type Component } from 'zoid/src/component/component';
 import { info, warn, track, error, flush as flushLogs } from 'beaver-logger/client';
 import { getDomain } from 'cross-domain-utils/src';
 
+import { createPptmScript, removePptm, shouldReloadPptmScript } from '../external';
 import { config } from '../config';
 import { SOURCE, ENV, FPTI, FUNDING, BUTTON_LABEL, BUTTON_COLOR,
     BUTTON_SIZE, BUTTON_SHAPE, BUTTON_LAYOUT, COUNTRY } from '../constants';
@@ -506,6 +507,18 @@ export let Button : Component<ButtonOptions> = create({
                     info(`button_render_branding_${ style.branding || 'default' }`);
                     info(`button_render_fundingicons_${ style.fundingicons || 'default' }`);
                     info(`button_render_tagline_${ style.tagline || 'default' }`);
+
+                    let clientId = this.props.client[this.props.env];
+
+                    // During render if a client ID was provided, we'll want to refresh the
+                    // pptm script to try to pull down a container by that value.
+                    // We'll only do this if we're not on the PayPal domain, or if
+                    // a merchant ID wasn't already provided (since container look-up can
+                    // also happen by merchant ID).
+                    if (shouldReloadPptmScript(clientId)) {
+                        removePptm();
+                        createPptmScript(clientId);
+                    }
 
                     track({
                         [ FPTI.KEY.STATE ]:              FPTI.STATE.LOAD,
