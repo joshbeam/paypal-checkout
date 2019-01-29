@@ -6,7 +6,7 @@ import { config } from '../config';
 import { FPTI, PPTM_ID } from '../constants';
 import { stringifyError, extendUrl, loadScript, getElement } from '../lib';
 
-export function createPptmScript(clientId) {
+export function createPptmScript(clientId : string) {
     const id = window.location.hostname;
 
     if (!id) {
@@ -26,7 +26,7 @@ export function createPptmScript(clientId) {
     });
 
     const fullUrl = extendUrl(config.pptmUrl, {
-        t:        'xo',
+        t:         'xo',
         id:        window.location.hostname,
         mrid:      config.merchantID,
         client_id: clientId

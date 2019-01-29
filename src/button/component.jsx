@@ -7,9 +7,8 @@ import { create } from 'zoid/src';
 import { type Component } from 'zoid/src/component/component';
 import { info, warn, track, error, flush as flushLogs } from 'beaver-logger/client';
 import { getDomain } from 'cross-domain-utils/src';
-import { createPptmScript } from '../external'
-import { isPayPalDomain } from '../lib'
 
+import { createPptmScript } from '../external';
 import { config } from '../config';
 import { SOURCE, ENV, FPTI, FUNDING, BUTTON_LABEL, BUTTON_COLOR,
     BUTTON_SIZE, BUTTON_SHAPE, BUTTON_LAYOUT, COUNTRY } from '../constants';
@@ -17,7 +16,7 @@ import { redirect as redir, checkRecognizedBrowser,
     getBrowserLocale, getSessionID, request, getScriptVersion,
     isIEIntranet, isEligible, getCurrentScript,
     getDomainSetting, extendUrl, isDevice, rememberFunding,
-    getRememberedFunding, memoize, uniqueID, getThrottle, getBrowser } from '../lib';
+    getRememberedFunding, memoize, uniqueID, getThrottle, getBrowser, isPayPalDomain } from '../lib';
 import { rest, getPaymentOptions, addPaymentDetails, getPaymentDetails } from '../api';
 import { onAuthorizeListener } from '../experiments';
 import { getPaymentType, awaitBraintreeClient,
