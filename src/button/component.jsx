@@ -509,31 +509,7 @@ export let Button : Component<ButtonOptions> = create({
                     info(`button_render_fundingicons_${ style.fundingicons || 'default' }`);
                     info(`button_render_tagline_${ style.tagline || 'default' }`);
 
-                    // If PPTM was loaded before onRender and no content was found in the container,
-                    // then we'll try again with the client ID (if present).
-                    // If PPTM hasn't loaded yet, and onRender is called now, then we'll set up an `onLoad` listener
-                    // to wait for PPTM to load, and then conduct the same logic (if
-                    // no content was found, then try to query via client ID).
-                    const tryCreatePptmScript = () => {
-                        let clientId = this.props.client[this.props.env];
-                        // During render if a client ID was provided, we'll want to refresh the
-                        // pptm script to try to pull down a container by that value.
-                        // We'll only do this if we're not on the PayPal domain, or if
-                        // a merchant ID wasn't already provided (since container look-up can
-                        // also happen by merchant ID). Note that this will only happen
-                        // if there was no content found in the container that was pulled down
-                        // in the `setup` script. This is important because we don't want
-                        // to pull down multiple containers that actually contain content,
-                        // otherwise we'll be firing duplicate tags.
-                        if (pptm.shouldReloadPptmScript(clientId)) {
-                            pptm.removePptm();
-                            pptm.createPptmScript(clientId);
-                        } else {
-                            pptm.onLoadWithNoContent(tryCreatePptmScript);
-                        }
-                    };
-
-                    tryCreatePptmScript();
+                    pptm.reloadPptmScript(this.props.client[this.props.env]);
 
                     track({
                         [ FPTI.KEY.STATE ]:              FPTI.STATE.LOAD,
