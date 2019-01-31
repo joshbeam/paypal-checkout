@@ -133,7 +133,7 @@ export function pptmFactory() : Object {
         to pull down multiple containers that actually contain content,
         otherwise we'll be firing duplicate tags.
         */
-        shouldReloadPptmScript(clientId : string) : boolean {
+        shouldReloadPptmScript(clientId : ?string) : boolean {
             if (noContentFoundInContainer === false) {
                 return false;
             }
