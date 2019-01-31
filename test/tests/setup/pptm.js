@@ -1,6 +1,7 @@
 /* @flow */
 
 import { PPTM_ID } from '../../../src/constants';
+import { pptm } from '../../../src/external';
 
 import { testSetup } from './common';
 
@@ -19,7 +20,7 @@ describe('paypal pptm script setup', () => {
                     return reject(new Error('Expected pptm script to be async'));
                 }
 
-                let expectedUrl = 'pptm.js?id=' + window.location.hostname + '&t=xo';
+                let expectedUrl = 'pptm.js?callback=${ pptm.callback }&id=' + window.location.hostname + '&t=xo';
 
                 if (el.src.indexOf(expectedUrl) === -1) {
                     return reject(new Error('Expected pptm script to contain ' + expectedUrl + ' but found ' + el.src));

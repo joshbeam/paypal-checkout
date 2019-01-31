@@ -1,10 +1,9 @@
 /* @flow */
 /* eslint max-lines: 0 */
-import { isPayPalDomain } from '../../../src/lib';
 import { config } from '../../../src/config';
 import { PPTM_ID } from '../../../src/constants';
 import { createTestContainer, destroyTestContainer, destroyElement } from '../common';
-import { createPptmScript } from '../../../src/external';
+import { pptm } from '../../../src/external';
 
 describe(`external pptm`, () => {
     let oldMockDomain;
@@ -34,12 +33,43 @@ describe(`external pptm`, () => {
 
     after(() => {
         // Go back to our initial state
-        createPptmScript();
+        pptm.createPptmScript();
     });
 
-    it('should re-load the pptm script during button render with async prop and correct url when a client ID is present', done => {
+    const checkPptmLoad = done => {
+        const scripts = Array.prototype.slice.call(document.getElementsByTagName('script'), 0).filter(script => {
+            return script.id === PPTM_ID;
+        });
+
+        if (scripts.length === 0) {
+            return done(new Error('Expected pptm script to be loaded'));
+        }
+
+        if (scripts.length > 1) {
+            return done(new Error(`Expected pptm script to be loaded only once, but it was loaded ${ scripts.length } times`));
+        }
+
+        let el = scripts[0];
+
+        if (!el.async) {
+            return done(new Error('Expected pptm script to be async'));
+        }
+
+        let expectedUrl = `pptm.js?callback=${ pptm.callback }&client_id=foo&id=${ window.location.hostname }&t=xo`;
+
+        if (el.src.indexOf(expectedUrl) === -1) {
+            return done(new Error(`Expected pptm script to contain ${ expectedUrl } but found ${ el.src }`));
+        }
+
+        return done();
+    };
+
+    it('should re-load the pptm script during button render with async prop and correct url when a client ID is present (render called *after* initial pptm is loaded)', done => {
         // Mock this side-effect from `setup` being called.
-        createPptmScript();
+        pptm.createPptmScript();
+
+        // Mock the serverside callback to retry creating the script.
+        window[pptm.callback]();
 
         window.paypal.Button.render({
             env:    'test',
@@ -48,35 +78,7 @@ describe(`external pptm`, () => {
             },
             test: {
                 onRender() : void {
-                    try {
-                        const scripts = Array.prototype.slice.call(document.getElementsByTagName('script'), 0).filter(script => {
-                            return script.id === PPTM_ID;
-                        });
-
-                        if (scripts.length === 0) {
-                            return done(new Error('Expected pptm script to be loaded'));
-                        }
-
-                        if (scripts.length > 1) {
-                            return done(new Error(`Expected pptm script to be loaded only once, but it was loaded ${ scripts.length } times`));
-                        }
-
-                        let el = scripts[0];
-
-                        if (!el.async) {
-                            return done(new Error('Expected pptm script to be async'));
-                        }
-        
-                        let expectedUrl = `pptm.js?client_id=foo&id=${ window.location.hostname }&t=xo`;
-        
-                        if (el.src.indexOf(expectedUrl) === -1) {
-                            return done(new Error(`Expected pptm script to contain ${ expectedUrl } but found ${ el.src }`));
-                        }
-
-                        return done();
-                    } catch (err) {
-                        return done(err);
-                    }
+                    return checkPptmLoad(done);
                 }
             },
 
@@ -90,8 +92,36 @@ describe(`external pptm`, () => {
         }, '#testContainer');
     });
 
+    it('should re-load the pptm script during button render with async prop and correct url when a client ID is present (render called *before* initial pptm is loaded)', done => {
+        // Mock this side-effect from `setup` being called.
+        pptm.createPptmScript();
+
+        window.paypal.Button.render({
+            env:    'test',
+            client: {
+                test: 'foo'
+            },
+
+            payment() {
+                done(new Error('Expected payment() to not be called'));
+            },
+
+            onAuthorize() {
+                done(new Error('Expected onAuthorize() to not be called'));
+            }
+        }, '#testContainer');
+
+        // Mock the serverside callback to retry creating the script.
+        window[pptm.callback]();
+
+        return checkPptmLoad(done);
+    });
+
     it('should not load pptm.js script tag from button render when inside a PayPal domain', done => {
         window.mockDomain = 'mock://www.paypal.com';
+
+        // Mock the serverside callback to retry creating the script.
+        window[pptm.callback]();
 
         window.paypal.Button.render({
             test: {
@@ -99,7 +129,7 @@ describe(`external pptm`, () => {
                     let el = document.getElementById(PPTM_ID);
 
                     if (el) {
-                        return done(new Error(`Expected pptm script to not be loaded, window.location.hostname = ${ window.location.hostname }, window.mockDomain = ${ window.mockDomain }, isPayPalDomain = ${ isPayPalDomain() }`));
+                        return done(new Error(`Expected pptm script to not be loaded, window.location.hostname = ${ window.location.hostname }, window.mockDomain = ${ window.mockDomain }`));
                     }
 
                     return done();
@@ -118,6 +148,9 @@ describe(`external pptm`, () => {
 
     it('should not re-load pptm.js script tag from button render if config.merchantID was already provided (since `setup` would have created pptm with the mrid param)', done => {
         config.merchantID = 'foo';
+
+        // Mock the serverside callback to retry creating the script.
+        window[pptm.callback]();
 
         window.paypal.Button.render({
             test: {
