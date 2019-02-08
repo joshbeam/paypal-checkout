@@ -55,7 +55,7 @@ describe(`external pptm`, () => {
             return done(new Error('Expected pptm script to be async'));
         }
 
-        let expectedUrl = `pptm.js?client_id=foo&id=${ window.location.hostname }&t=xo`;
+        let expectedUrl = `pptm.js?client_id=foo&id=${ window.location.hostname }&source=checkoutjs&t=xo&v=test_minor`;
 
         if (el.src.indexOf(expectedUrl) === -1) {
             return done(new Error(`Expected pptm script to contain ${ expectedUrl } but found ${ el.src }`));

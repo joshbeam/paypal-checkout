@@ -92,7 +92,9 @@ export function pptmFactory() : Object {
                 t:         'xo',
                 id:        window.location.hostname,
                 mrid:      config.merchantID,
-                client_id: ''
+                client_id: '',
+                v:         config.version,
+                source:    'checkoutjs'
             };
         
             if (clientId) {
