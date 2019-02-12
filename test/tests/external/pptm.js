@@ -3,7 +3,6 @@
 import { config } from '../../../src/config';
 import { PPTM_ID } from '../../../src/constants';
 import { createTestContainer, destroyTestContainer, destroyElement } from '../common';
-import { pptm } from '../../../src/external';
 
 describe(`external pptm`, () => {
     let oldMockDomain;
@@ -32,6 +31,7 @@ describe(`external pptm`, () => {
     });
 
     after(() => {
+        const pptm = require('../../../src/external/pptm').pptm;
         // Go back to our initial state
         pptm.createPptmScript();
     });
@@ -65,6 +65,7 @@ describe(`external pptm`, () => {
     };
 
     it('should re-load the pptm script during button render with async prop and correct url when a client ID is present (render called *after* initial pptm is loaded)', done => {
+        const pptm = require('../../../src/external/pptm').pptm;
         // Mock this side-effect from `setup` being called.
         pptm.createPptmScript();
 
@@ -93,6 +94,7 @@ describe(`external pptm`, () => {
     });
 
     it('should re-load the pptm script during button render with async prop and correct url when a client ID is present (render called *before* initial pptm is loaded)', done => {
+        const pptm = require('../../../src/external/pptm').pptm;
         // Mock this side-effect from `setup` being called.
         pptm.createPptmScript();
 
@@ -118,6 +120,7 @@ describe(`external pptm`, () => {
     });
 
     it('should not load pptm.js script tag from button render when inside a PayPal domain', done => {
+        const pptm = require('../../../src/external/pptm').pptm;
         window.mockDomain = 'mock://www.paypal.com';
 
         // Mock the serverside callback to retry creating the script.
@@ -147,6 +150,7 @@ describe(`external pptm`, () => {
     });
 
     it('should not re-load pptm.js script tag from button render if config.merchantID was already provided (since `setup` would have created pptm with the mrid param)', done => {
+        const pptm = require('../../../src/external/pptm').pptm;
         config.merchantID = 'foo';
 
         // Mock the serverside callback to retry creating the script.
